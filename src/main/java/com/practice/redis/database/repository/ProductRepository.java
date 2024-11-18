@@ -4,8 +4,10 @@ import com.practice.redis.database.domain.entity.Product;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface ProductRepository extends CrudRepository<Product, UUID> {
+    Optional<Product> findByName(String name);
 }

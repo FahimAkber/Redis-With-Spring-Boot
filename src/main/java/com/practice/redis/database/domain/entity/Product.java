@@ -3,6 +3,7 @@ package com.practice.redis.database.domain.entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
 import java.math.BigDecimal;
@@ -13,7 +14,9 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Product {
-    private UUID name;
-    private Company company;
+    @Id
+    private UUID id;
+    private String name;
+    private UUID companyId;
     private BigDecimal price;
 }
