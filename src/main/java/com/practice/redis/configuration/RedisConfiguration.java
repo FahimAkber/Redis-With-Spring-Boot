@@ -1,5 +1,6 @@
 package com.practice.redis.configuration;
 
+import com.practice.redis.messageBroker.service.MessageSubscriber;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -10,6 +11,9 @@ import org.springframework.data.redis.connection.lettuce.LettuceClientConfigurat
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettucePoolingClientConfiguration;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.PatternTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
@@ -64,10 +68,24 @@ public class RedisConfiguration {
 
     private GenericObjectPoolConfig<Void> getGenericObjectPoolConfig() {
         GenericObjectPoolConfig<Void> genericObjectPoolConfig = new GenericObjectPoolConfig<>();
-        genericObjectPoolConfig.setMaxTotal(maxConnection);  //Max Connection
+        genericObjectPoolConfig.setMaxTotal(maxConnection);
         genericObjectPoolConfig.setMaxIdle(poolMaxConnection);
         genericObjectPoolConfig.setMinIdle(poolMinConnection);
 
         return genericObjectPoolConfig;
+    }
+
+    @Bean
+    public RedisMessageListenerContainer container(RedisConnectionFactory connectionFactory,
+                                                   MessageListenerAdapter listenerAdapter) {
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory);
+        container.addMessageListener(listenerAdapter, new PatternTopic("my-topic"));
+        return container;
+    }
+
+    @Bean
+    public MessageListenerAdapter listenerAdapter(MessageSubscriber subscriber) {
+        return new MessageListenerAdapter(subscriber, "onMessage");
     }
 }
